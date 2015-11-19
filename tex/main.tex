@@ -1,0 +1,106 @@
+\documentclass[a4paper,12pt]{report}
+
+%\usepackage{mdframed}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+%\usepackage[magyar]{babel}
+\usepackage{tabularx}
+\usepackage{picture}
+\usepackage{enumerate}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{lmodern}
+\usepackage{epigraph}
+%\usepackage[a4paper, twoside,left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm,bindingoffset=1cm]{geometry}
+
+%\usepackage{fullpage}
+\usepackage{cases}
+\usepackage{url}
+\usepackage[usenames,dvipsnames]{color}
+%\pagestyle{plain}
+
+%\frenchspacing
+\linespread{1.3}
+%%%%%%%%%%%% S A J A T %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newtheorem{defi}{Defin\'ici\'o}[section]
+\newtheorem{algo}{Algoritmus}[section]
+\newtheorem{tetel}{T\'etel}[section]
+\newtheorem{all}{\'All\'it\'as}[section]
+\renewcommand*{\o}{\H{o}}
+\renewcommand*{\u}{\H{u}}
+\newcommand{\Z}{\mathbb{Z}}
+\renewcommand*{\r}{\color{black}}
+\newcommand{\g}{\color{black}}
+\newcommand{\G}{\mathbb{G}}
+\newcommand{\T}{\mathcal{T}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Online recommendation algorithms}
+\author{P\'eter Szalai}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+\begin{document}
+
+\pagenumbering{Roman}
+
+\thispagestyle{empty}
+\begin{center}
+
+{ $\left. \right.$ \\ \vspace{0.5cm} \large \textbf{Thesis} \\ }
+\vspace{2cm}
+
+{ \large \textbf{Online recommendation algorithms} \\
+\vspace{1cm}  
+\textbf{Szalai P\'eter} \\ }
+\vspace{2cm}
+
+\begin{tabular}{c}
+
+\end{tabular}
+
+\begin{tabular}{l l l }
+ {\bf Supervisor:}
+\end{tabular}
+
+\vspace*{2cm}
+
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=.4]{pic/bme_logo.jpg}
+\end{figure}
+\vspace*{-.25cm}
+\begin{center}
+{\normalsize \rmfamily Budapest University of Technology and Economics}
+\end{center}
+\vspace*{-.5cm}
+\begin{center}
+{\normalsize \rmfamily VIK-SZIT}
+\end{center}
+
+\begin{center}
+{\normalsize \rmfamily 2016.}
+\end{center} 
+
+\end{center}
+\newpage
+
+\tableofcontents
+\pagenumbering{arabic}
+
+\setcounter{page}{1}
+\include{intro_f}
+
+\newpage
+ \addcontentsline{toc}{chapter}{Bibliography}
+\begin{thebibliography}{9}
+
+\end{thebibliography}
+\end{document}
