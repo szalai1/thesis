@@ -3,8 +3,12 @@
 
 ### compile
 in the root of the repo:
-`make`
+```
+make
+```
 
 to clean up the mess of the latex:
-`make clean`
+```
+make clean
+```
 
