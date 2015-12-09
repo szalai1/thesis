@@ -8,7 +8,7 @@ functions to estimate it.
 In section [REF] we will talk about collaborative filtering, where we will use
 information about users' preference and the users' similarity to recommend.
  After that we will see another approace, where we will use informations about 
-items and users preferences to recommend items to users.
+items and users preferences to recommend items.
 
 As it was previously mentioned, there are different ways to evaluate users 
 satisfaction. In section [REF], we can read about rating and ranking based
@@ -19,32 +19,63 @@ functions use the predicted and known \emph{values} to measure the goodness of
 
 
 
-\section{Modells}
+\section{Models}
 \subsection{Collaborative filtering}
+In general, user $u$ rates item $i$. We can discribe each event with triplet
+$(u, i, r)$, where $r$ represents the rating. If we map these events into a $R$
+matrix, where $R[i,j]$ is the rating of item $j$ given by the user $i$. This $R$
+matrix is mostly unknown.
+
+\subsubsection{Matrix factorization}
+If we could know the unkown values, we would be able to recommend the item with the
+highst score in the user's row. To achieve this we will estimate the known values of
+the matrix $R$ with product of two lower dimension matrices. 
+
+ 
 \subsection{Content-based}
 
 \section{Evaluation}
-%Let $\mathcal{I}$ be the set of items. We can look at a recommendation as socres
-%belongs to items, where higher score means higher relevance to the user. In an 
-%ordered list of items by score, each item has a rank $r_i$. We can consider each item  
-%If we know the users'  real priority, we can compute the stisfaction.
+A recommender systems can order items by their relevance for the users, but
+users has their own lists. In this case we should somehow measure the goodness
+of the recommender system. Thera are two main group of evaluation function
+ranking and rating based ones.
 
-A recommender system order a score for each item, where higher score means 
-higher relevance for the user. In this case a recommendation is an ordered list 
-of items by their score. 
+\subsection{Ranking based evaluation functions}
+Let $\mathcal{I}$ be the set of items, $r_i$ be the rank of the item in the
+user's relevance list \footnote{lower rank means highter imortance}  and
+$r'_i$ be the rank of the item $i$ in list of the recommender system.
+Moreover, we mark the set of items with $k$ or lower rank with $\mathcal{I}@k$.
 
+\subsubsection{Normalized discounted cumulative gain}
+If we assume that the better recommendation systems put the relevant item
+earlier in the list, then  we need a function which award the relevant items
+in ratio to their relevance  and punish if an important item is later in the
+list. That's how we get
 
+$$ DCG@k=\sum_{i \in \mathcal{I}@k}\frac{2^{r_i}-1}{log_2(r'_i+1)} $$
+
+DCG@k has some mentionable trait:
 \begin{itemize}
-  \item 
-  \item $r^,_i$ recommended rank
-  \itme $r_i$ user's real rank
-  \item $s^,_i$ predicted score
-  \item $s_i$ user's real score
+\item The only way to get the highst DCG@k is find out the user's real preference
+  list. We call this value IDCG@k.
+\item If the recommended list first $k$ element is the user's last $k$ element in
+  reverse order, we get the lowest DCG@k score.
+  user's  list.
+\item Let's swap two items in the recommended list. We get higher score after the
+  swap, if these two items are in the same order as in the user's list.
 \end{itemize}
+To use this function as measure of recommendations, we have to normalize it with
+IDCG@k.
+
+$$nDCG@k=\frac{DCG@k}{IDCG@k}$$
+
+\subsubsection{AUC/ROC??}
+
+\subsection{Rating based evaluation functions}
+\subsubsection{MSE}
 
 \begin{itemize}
-\item $MSE=\sum_{i\in\mathcal{I}} (s^,_i - s_i)^2$ 
-\item $MSE=\sum_{i\in\mathcal{I}} (s^,_i - s_i)^2$
-\item $MSE=\sum_{i\in\mathcal{I}} (s^,_i - s_i)^2$
+\item $MSE=\sum_{i\in\mathcal{I}} (r'_i - r_i)^2$ 
+
   
 \end{itemize}
