@@ -1,16 +1,33 @@
 \chapter{Recommender Systems}
 Recommender systems can score or order the users' oportunities to help them to
-make the choice with the higher satisfaction rate. We are not capable to measure
+make the choice with higher satisfaction rate. We are not capable to measure
 the users satisfaction rate directly, that's why we use distinct evaluation functions
 to estimate it.
 
-In this section we will talk about collaborative filtering, where we will use the
-information of other users' preference to recommend. After that we will see another
-approace, where we will use informations about items and users preferences to recommend
-items to users.
+In section [REF] we will talk about collaborative filtering, where we will use
+information about users' preference and the users' similarity to recommend. After that
+we will see another approace, where we will use informations about items and users
+preferences to recommend items to users.
+
+As it was previously mentioned, there are different ways to evaluate users satisfaction.
+In section [REF], we can read about rating and ranking based evaluation functions, such
+as MSE, nDCG or AUC. Rating based evaluation functions use the predicted and known
+\emph{values} to measure the goodness of recommender system, while ranking based ones use
+the \emph{rank} of the item in the recommended item list.
+
+
 
 \section{Modells}
-\subsection{Content-based}
 \subsection{Collaborative filtering}
+\subsection{Content-based}
 
 \section{Evaluation}
+Let $\mathcal{P}$ be the list of the recommended items ($i$), where each item has
+score $s_i$, which's value correlate with its relevance. We can also consider the
+users' real preferencies (the \emph{truth}) as item score pairs, let
+
+
+\begin{itemize}
+\item $MSE=\sum_{i\in\mathcal{L}}$
+  
+\end{itemize}
