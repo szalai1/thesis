@@ -1,19 +1,21 @@
 \chapter{Recommender Systems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Recommender systems can score or order the users' oportunities to help them to
 make the choice with higher satisfaction rate. We are not capable to measure
-the users satisfaction rate directly, that's why we use distinct evaluation functions
-to estimate it.
+the users satisfaction rate directly, that's why we use distinct evaluation 
+functions to estimate it.
 
 In section [REF] we will talk about collaborative filtering, where we will use
-information about users' preference and the users' similarity to recommend. After that
-we will see another approace, where we will use informations about items and users
-preferences to recommend items to users.
+information about users' preference and the users' similarity to recommend.
+ After that we will see another approace, where we will use informations about 
+items and users preferences to recommend items to users.
 
-As it was previously mentioned, there are different ways to evaluate users satisfaction.
-In section [REF], we can read about rating and ranking based evaluation functions, such
-as MSE, nDCG or AUC. Rating based evaluation functions use the predicted and known
-\emph{values} to measure the goodness of recommender system, while ranking based ones use
-the \emph{rank} of the item in the recommended item list.
+As it was previously mentioned, there are different ways to evaluate users 
+satisfaction. In section [REF], we can read about rating and ranking based
+ evaluation functions, such as MSE, nDCG or AUC. Rating based evaluation 
+functions use the predicted and known \emph{values} to measure the goodness of
+ recommender system, while ranking based ones use the \emph{rank} of the item in
+ the recommended item list.
 
 
 
@@ -22,12 +24,27 @@ the \emph{rank} of the item in the recommended item list.
 \subsection{Content-based}
 
 \section{Evaluation}
-Let $\mathcal{P}$ be the list of the recommended items ($i$), where each item has
-score $s_i$, which's value correlate with its relevance. We can also consider the
-users' real preferencies (the \emph{truth}) as item score pairs, let
+%Let $\mathcal{I}$ be the set of items. We can look at a recommendation as socres
+%belongs to items, where higher score means higher relevance to the user. In an 
+%ordered list of items by score, each item has a rank $r_i$. We can consider each item  
+%If we know the users'  real priority, we can compute the stisfaction.
+
+A recommender system order a score for each item, where higher score means 
+higher relevance for the user. In this case a recommendation is an ordered list 
+of items by their score. 
 
 
 \begin{itemize}
-\item $MSE=\sum_{i\in\mathcal{L}}$
+  \item 
+  \item $r^,_i$ recommended rank
+  \itme $r_i$ user's real rank
+  \item $s^,_i$ predicted score
+  \item $s_i$ user's real score
+\end{itemize}
+
+\begin{itemize}
+\item $MSE=\sum_{i\in\mathcal{I}} (s^,_i - s_i)^2$ 
+\item $MSE=\sum_{i\in\mathcal{I}} (s^,_i - s_i)^2$
+\item $MSE=\sum_{i\in\mathcal{I}} (s^,_i - s_i)^2$
   
 \end{itemize}
