@@ -4,3 +4,50 @@
 Matrix decomposition is a massive field of linear algebra. In this chapter, we do
 not want to present the whole area, but we expound the main algorithms, in the
 context of recommender systems.
+
+\begin{theo}
+  Let $A\in \mathbb{R}^{n\times m}$ of rank $r$. Then there is a matrix
+  $B\in \mathbb{R}^{n\times r}$ and $C\in \mathbb{R}^{r\times m}$
+  matrix $C$, which ones satisfy $A=BC$.
+\end{theo}
+
+Theorem [REF] allows us to represent low rank matrices with lower dimensional
+matrices.
+
+While the Theorem [REF] talks about the exact matrix factorization in possession
+of the whole matrix, our aim is to approximate the known values and in the same
+time this approximation can estimate the unknown scores.
+
+As it was discused in Section [REF], there are several evaluation functions to
+measure recommender systems, but we cannot optimize matrix factorization for most
+of them. In this Chapter we would like to minimize the loss $L$.
+
+\section{Stochastic gradient descent}
+Stohastic gradient descent assume that $L$ is a differenciable function \footnote{
+This function is mainly MSE}  . The idea is the following:
+\[ \theta_{n+1}=\theta_n - \varepsilon_n L'(\theta_n) \]
+
+Where $\varepsilon_n$ is the size of step \footnote{It is called \emph{learning rate}
+  in recommender systems.} in round $n$ and $\theta_{n}$ is solution after $n$ step.
+
+\subsection{Matrix factorization with SGD}
+Let's use $SGD$ to fatorize the already mentioned rating matrix $R$. We can use the
+known elements of matrix $R$ as training points to find the appropriate matrix $U$ and
+matrix $I$. With given $U$ and $I$, we can compute the error for each $R[i;j]$ known
+value by any loss $L$ function. Denote this error value with $L[i,j]$.
+
+\begin{algorithm}
+  \KwData{Elements of matrix $R$}
+  \KwResult{Factor matrices $U$ and $I$}
+  $U_0\leftarrow$ random values\;
+  $I_0\leftarrow$ random values\;
+  \While{$L((U_n;I_n))<\varepsilon$ }{
+      Select a random $R[i,j]$\;
+    $U_{n+1}[i;*]\leftarrow U_{n}[i;*]-\varepsilon_n \frac{\partial}{\partial U_n[i;*]}L[i;j]$\;
+    $I_{n+1}[*;j]\leftarrow I_{n}[*;j]-\varepsilon_n \frac{\partial}{\partial I_n[*;j]}L[i;j]$\;
+  }
+  \Return $U,I$
+  \caption{SGD to factorize matrices}
+\end{algorithm}
+
+\section{Alternating least squares}
