@@ -1,78 +1,96 @@
+
 \chapter{Recommender Systems}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Recommender systems can score or order the users' opportunities to help them to
-make the decision with higher satisfaction rate. We are not capable to measure
-the users' satisfaction rate directly, that's why we use distinct evaluation 
-functions to estimate it.
+make the decision with higher satisfaction rate. In this secsion, we present the
+these systems' operation and the how we can measure their performance.
 
-In section [REF] we will talk about collaborative filtering, where we will use
-information about users' preference and the similarities between the users to
+In Section [REF] we talk about collaborative filtering, where we will use
+information about users' preferences and the similarities between them to
 recommend. Furthermore we will see another approach, using information about
-items and users' preferences for recommendation.
+items and users for recommendation.
 
-As it was previously mentioned, there are different ways to evaluate users' 
-satisfaction. In section [REF], we can read about rating and ranking based
- evaluation functions, such as MSE, nDCG or AUC. Rating based evaluation 
-functions use predicted and known \emph{values} to measure the goodness of
- recommender system, while ranking based ones use the \emph{rank} of the item in
- the recommended item list.
+There are different ways to evaluate users' satisfaction. Section [REF] is read
+about rating and ranking based evaluation functions, such as MSE, nDCG or AUC.
+Rating based evaluation functions use predicted and known \emph{values} to
+measure the goodness of  recommender system, while ranking based ones use the
+\emph{rank} of the item in  the recommended item list.
 
 \section{Models}
 \subsection{Collaborative filtering}
 In general, user $u$ rates item $i$. We can discribe each event with triplet
-$(u, i, r)$, where $r$ represents the rating. If we map these events into an $R$
+$(u, i, r)$, where $r$ represents the rating. We map these events into an $R$
 matrix, where $R[i,j]$ denotes the rating of item $j$ given by the user $i$. This
-$R$ matrix is mostly unknown.
+matrix $R$ is a spare matrix, implied by the nature of the data. For instance,
+in Netflix prize, the 1.17\% of the elements was given in the matrix $R$ [REF]. We
+call those items \emph{positive item} or \emph{sample}, which ones are rated by
+the user, and we call \emph{negative items} the others.
 
 \subsubsection{Matrix factorization}
-If we could know the unkown values, we would be able to recommend the item with the
-highest score in the user's row. To achieve this we will approximate the known values of
-the matrix $R$ with product of two lower dimension matrices. 
-
+Our goal to estimate the unknown values in the matrix $R$. To achieve this we
+approximate the known values of the matrix $R$ with product of two lower dimension
+matrices. After the approximation we get values for every $R[i,j]$ and that value
+is our prediction for relevance of item $j$ for user $j$. In Secsion [REF], we
+discuss about this topic in detail.
  
 \subsection{Content-based recommendation}
+In chapter [REF].
 
 \section{Evaluation}
-Recommender systems can order items by their relevance for the users, but
-users have their own lists as well. In this case we should somehow measure
-the goodness of the recommender system. There are two main groups of evaluation
-functions: ranking and rating based ones.
+Recommender systems can order items by their relevance for the users. We compare the
+predicted values with the actual user-item preferences to evaluate the given recommender
+system. The evaluation functions separable two main groups: ranking and rating based ones.
 
-\subsection{Ranking based evaluation functions}
+\subsection{Rating based evaluation }
+
+\subsubsection{Meas square error}
+Mean square error or \emph{Euclidean distance} is the commonest metric. We can use it to
+evaluate recommender systems also:
+
+\[MSE=\sum_{i\in\mathcal{I}}(s'_i - s_i)^2\]
+
+\subsection{Ranking based evaluation}
 Let $\mathcal{I}$ be the set of items, $r_i$ be the rank of the item $i$ in the
 user's relevance list \footnote{lower rank means highter importance}  and
 $r'_i$ be the rank of the item $i$ in the list of the recommender system.
-Moreover, the set of items with $k$ or lower rank will be denoted by $\mathcal{I}@k$.
+The top $k$ of recommended list will be denoted by $\mathcal{I}@k$. In other words
+$\mathcal{I}@k$ is the set of items with $k$ or lower rank. Other separation of
+items is to divide them into positive and negative items, marked with  $\mathcal{I}^+$ and
+$\mathcal{I}^-$ respectively.
 
 \subsubsection{Normalized discounted cumulative gain}
-If we assume that better recommendation systems put the relevant item
+We assume that better recommendation systems put the relevant item
 in the list earlier, then we need a function, which awards the relevant items
 in ratio to their relevance and punishes, if an important item is later in the
-list. That's how we get
+list. 
 
-$$ DCG@k=\sum_{i \in \mathcal{I}@k}\frac{2^{r_i}-1}{log_2(r'_i+1)}.$$
+$$ DCG@k=\sum_{i \in \mathcal{I}@k}\frac{2^{s_i}-1}{\log_2(r'_i+1)}.$$
 
 DCG@k has some mentionable trait:
 \begin{itemize}
-\item The only way to get the highest DCG@k is to find out the user's real preference
-  list. We call this maximum value IDCG@k.
+\item The maximum value of $DCG@k$ is $IDCG@k$. We get this value if and only if, the
+  recommended list contains the same items in the same order as the user's list.
 \item If the first $k$ element of the recommended list are the user's last $k$ element in
-  reverse order, we get the lowest DCG@k score.
+  reverse order, we get the lowest $DCG@k$ score.
 \item Let's swap two items in the recommended list. We get higher score after the
   swap, if these two items are in the same order as in the user's list.
 \end{itemize}
 To use this function as measure of recommendations, we have to normalize it with
-IDCG@k.
+$IDCG@k$.
 
 $$nDCG@k=\frac{DCG@k}{IDCG@k}$$
 
-\subsubsection{AUC/ROC??}
+\subsubsection{Area under the curve}
+$AUC$ is mainly used to evaluate binary classifications by computing the are under
+the ROC curve. In context of recommender systems $AUC$ is used to evaluate the
+entire list instead of top $k$ of the list. $AUC$ reward each item pair $i$ $j$, if
+item $i$ has higher score, than item $j$ and item $i$ is a positive sample while item
+$j$ is a negative item.
 
-\subsection{Rating based evaluation functions}
-\subsubsection{MSE}
+The fromal definition is:
 
-\begin{itemize}
-\item $MSE=\sum_{i\in\mathcal{I}} (r'_i - r_i)^2$ 
+\[ AUC=\frac{1}{\|\mathcal{I}^{+}\|\cdot\|\mathcal{I}^-\|}
+\sum_{(i,j)\in\mathcal{I}^+\times\mathcal{I}^-}\mathbbm{1} \{s_i > s_j \} \]
 
-  
-\end{itemize}
+
+
