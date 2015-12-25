@@ -1,55 +1,100 @@
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Matrix factorization}
-Matrix decomposition is a massive field of linear algebra. In this chapter, we do
-not want to expound the whole area, but we present the main algorithms, in the
-context of recommender systems.
+In this Chapter we present matrix factorization models used in recommender systems 
+and their relation to singular vector decomposition. 
 
-\begin{theo}
-  Let $A\in \mathbb{R}^{n\times m}$ of rank $r$. Then there is a matrix
-  $B\in \mathbb{R}^{n\times r}$ and $C\in \mathbb{R}^{r\times m}$
-  matrix $C$, which ones satisfy $A=BC$.
-\end{theo}
+\section{Model}
 
-Theorem [REF] allows us to represent low rank matrices with lower dimensional
-matrices.
+As it was mentioned in Section [REF], our goal is to estimate the missing element of the 
+score matrix $S\in\mathbb{R}^{n\times m}$ with the product of two dense, low dimension 
+matrix. Let these two matrices be $P\in\mathbbb{R}^{n\times k}$ and 
+$Q\in\mathbb{R}^{k\times m}$ and denote the approximation of matrix $S$ with 
+$\hat{S}=PQ$.
 
-While the Theorem [REF] talks about the exact matrix factorization in possession
-of the whole matrix, our aim is to approximate the known values and in the same
-time this approximation can estimate the unknown scores.
+Our prediction for a given user $u$ and item $i$ pair is:
+\[\hat{s}_{ui}=p_{u}q_{i},\]
 
-As it was discused in Section [REF], there are several evaluation functions to
-measure recommender systems, but we cannot optimize matrix factorization for most
-of them. In this Chapter we would like to minimize the loss $L$.
+where $p_u$ and $q_i$, denote $u^{th}$ row  of $P$ and  $i^{th}$ column of $Q$
+respectively. We call matrix $P$ user factors because each row  of the $P$ belongs 
+to a user and similarly matrix $Q$ is called item factors. 
 
-\section{Stochastic gradient descent}
-Stohastic gradient descent assume that $L$ is a differenciable function \footnote{
-This function is mainly MSE}. The idea is the following:
-\[ \theta_{n+1}=\theta_n - \varepsilon_n L'(\theta_n) \]
+\section{Optimizing the factorization}
+In general, we measure the quality of the approximation with a loss function $L$. 
+A loss function maps model parameters to a real number. In case of matrix factorization these 
+parameter values are the factor matrices.
 
-Where $\varepsilon_n$ is the size of step \footnote{It is called \emph{learning rate}
-  in recommender systems.} in round $n$ and $\theta_{n}$ is solution after $n$ step.
+A frequently used loss function is the mean square error on the known $s_{u,i}$ values 
+of the matrix $S$,
 
-\subsection{Matrix factorization with SGD}
-Let's use $SGD$ to fatorize the already mentioned rating matrix $R$. We can use the
-known elements of matrix $R$ as training points to find the appropriate matrix $U$ and
-matrix $I$. With given $U$ and $I$, we can compute the error for each $R[i;j]$ known
-value by any loss $L$ function. Denote this error value with $L[i;j]$.
+\[L(S,P;Q)=\sum_{(u,i)}(s_{u,i}-p_{u}q_{i})^2 .\]
 
-\begin{algorithm}
-  \KwData{Elements of matrix $R$}
-  \KwResult{Factor matrices $U$ and $I$}
-  $U_0\leftarrow$ random values\;
-  $I_0\leftarrow$ random values\;
-  \While{$L((U_n;I_n))<\varepsilon$ }{
-      Select a random $R[i,j]$\;
-      $U_{n+1}[i;*]\leftarrow U_{n}[i;*]-\varepsilon_n
-      \frac{\partial}{\partial U_n[i;*]}L[i;j]$\;
-      $I_{n+1}[*;j]\leftarrow I_{n}[*;j]-\varepsilon_n
-      \frac{\partial}{\partial I_n[*;j]}L[i;j]$\;
+Our objective is to minimize the loss function $L$ with a learning algorithm.
+
+\subsection{Learning with stochastic gradient descent}
+Stohastic gradient descent assumes that $L$ is a differentiable function \footnote{
+This function is mainly MSE}. The concept behind SGD is the following:
+\begin{itemize}
+\item Starting from the actual model parameters $\hat{\theta}$, we determine the 
+gradient \footnote{Gradient is the steepest direction in the given point.} of 
+the loss function $L$ with respect to $\hat{\theta}$
+\[\nabla L = \frac{\partial L}{\partial \hat{\theta}}.\]
+
+\item Using the gradient vector, we update the parameters by moving towards the 
+opposite of the gradient,
+
+\[ \hat{\theta}_{n+1}=\hat{\theta}_n - \mu \nabla L ,\]
+
+where $\mu$ is the \emph{learning rate}, a parameter of the algorithm. 
+\end{itemize}
+
+Applying this idea to improve the prediction for matrix $S$:
+
+\begin{algorithm}[H]
+  \KwData{Elements of matrix $S$}
+  \KwResult{Factor matrices $P$ and $Q$}
+    Initialize $P$ and $Q$ matrices with random values\;
+  \While{termination condition($L(S,P_n;Q_n)$)}{
+      Select a random $S_{ui}$\;
+      Compute $\frac{\partial L}{\partial \hat{p}_{u}}$\;
+      Compute $\frac{\partial L}{\partial \hat{q}_{i}}$ \;
+      $\hat{p}_{u}\leftarrow \hat{p}_{u}-\mu \frac{\partial}{\partial \hat{p}_{u}} L$\;
+      $\hat{q}_{u}\leftarrow \hat{q}_{u}-\mu \frac{\partial}{\partial \hat{q}_{u}} L$\;
   }
-  \Return $U,I$
+  \Return $P,Q$
   \caption{SGD to factorize matrices}
 \end{algorithm}
 
-\section{Alternating least squares}
+
+In general, loss functions assembled from a score error minimalization part, and 
+a model complexity regularization part. If we would use only the score error 
+minimalization part, the model may overfit.
+
+Frequently use loss function in recommender systems is 
+
+ \[ L(S,P;Q)=\sum_{(u,i)}(s_{ui}-p_u q_i)^2 + \lambda (\|p_u\|^2+\|q_u\|^2). \]
+
+This loss function minimizes the difference between the recommended and the actual score in MSE 
+and the squared sum of the length of the factors. $\lambda$ is an non negative, finite
+parameter of the function, the regularization rate. 
+
+In case of the above detailed loss function, the algorithm iterative steps becomes the following:
+
+\[ \hat{p}_{u}\leftarrow \hat{p}_{u}-\mu (2(s_{ui}-p_u q_i)q_i - \lambda p_u)\]
+\[\hat{q}_{i}\leftarrow \hat{q}_{i}-\mu (2(s_{ui}-p_u q_i)p_u - \lambda q_i) \]
+
+Note that, when we update $q_i$, we use the $p_u$ from the previouse iteration, instead of
+the previouse step.
+
+
+\subsection{Matrix factorization with alternating least squares}
+Another iterative approach to factorize a matrix is the following:
+\begin{itemize}
+\item For a given matrix $S$ and a fixed matrix $P_n$, we compute the matrix $Q_{n+1}$ to 
+minimize the $L(S,P_n Q_{n+1})$ value.
+\item  After we found the best matrix $Q_{n+1}$, we improve our estimation to
+$P$ by finding a better matrix $P_{n+1}$, which minimize  $L(S,P_{n+1} Q_{n+1})$.
+\item We repeat the previous two step while we reach a given condition. 
+\end{itemize}
+
+Further information can be found in [REF].h
+\section{Singular vector decomposition}
