@@ -1,0 +1,131 @@
+
+
+\chapter{Recommender Systems}\label{ch:rec_sys}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Recommender systems can order items by users preferences to help the users to
+make better decisions. In this Section, we present the
+their operation and how we can measure their performance.
+
+In Section \ref{subsec:collab} we introduce collaborative filtering.These methods use
+information about interactions between users and items to build recommendation models. 
+Furthermore, we will see another approach, using information about items and users for
+recommendation in Section \ref{subsec:context}.
+
+There are different ways to evaluate users' satisfaction. Subsection \ref{sec:eval} is about 
+rating and ranking based evaluation functions, such as MSE, nDCG or AUC.
+Rating based evaluation functions use the predicted and known \emph{values} of relevances 
+to measure the goodness of  recommender system, while ranking based ones use the
+\emph{rank} of the item in  the recommended item list for the given user.
+
+\section{Explicit and implicit recommendation}\label{sec:exp_inpl}
+Recommendation tasks can be separated to two main groups based on the nature of the
+time series. The key difference is if the actual user rating on items are available.
+
+On the one hand, if we have the exact scores for the interacted user-item pairs, we 
+can use these explicit values to predict the unrated items'
+score. We call this approach \emph{explicit recommendation}.
+
+On the other hand, this information is not always available 
+and the time series contains only the existence of the 
+interaction between the user and the item. This type of time 
+series is common in online content consumption, when users interact with 
+ items, such as musics, videos  or blog articles, but they do not 
+rate them.  We call this type recommendation tasks \emph{implicit recommendation.}
+
+\section{Models}
+\subsection{Collaborative filtering}\label{subsec:collab}
+We use time series of events to build recommender systems, where each data point 
+represents an interaction, when user $u$ rated item $i$. We can describe these events 
+with triplet $(u, i, s)$, where $s$ represents the score or rating. We  can map these
+events into a matrix $S$ , where $S_{ui}$ denotes the  score of item $i$ given by the
+user $u$. This matrix $S$ is a spare matrix, implied by the nature of the data. For 
+instance, in the Netflix prize \cite{bennett2007netflix}, 1.17\% of the elements was given. 
+
+
+\subsubsection{Matrix factorization}\label{subsec:mf}
+Our goal is to estimate the unknown values in the matrix $S$. To achieve this, we
+approximate the known values of the matrix $S$ with product of two lower dimensional
+dense matrices. After the approximation, we get values for every $S_{ij}$ and that 
+value is our prediction for the relevance of item $j$ for user $i$. In Chapter \ref{ch:mf}, we
+discuss this topic in detail.
+ 
+\subsection{Context-based recommendation}\label{subsec:context}
+If we use not only the fact of the interaction, but other circumstances too, we talk about 
+context-based recommendation. We present this approach in chapter \ref{ch:context}.
+
+\section{Online and offline recommendation}
+
+\section{Evaluation}\label{sec:eval}
+Recommender systems can order items by their relevance for the users. We compare the
+predicted values with the actual user-item preferences to evaluate the given recommender
+system. The evaluation functions can be separated two main groups: rating and ranking  based ones.
+
+\subsection{Rating based evaluation }
+
+\subsubsection{Mean square error}
+Mean square error or \emph{Euclidean distance} is a common metric. We can use it to
+evaluate recommender systems,
+
+\[MSE=\sum_{i\in\mathcal{I}}(\hat{s}_{ui} - s_{ui})^2.\]
+
+Where $\hat{s}_{ui}$ the predicted value for the user $u$ and item $i$ pair and $s_i$ is the known.
+
+
+\subsection{Ranking based evaluation}
+Let $\mathcal{I}$ be the set of items, $r_i$ be the rank of the item $i$ in the
+user's relevance list \footnote{lower rank means higher importance}  and
+$r'_i$ be the rank of the item $i$ in the predicted list of the recommender system.
+We denote the top $k$ elements of the recommended list by $\mathcal{I}@k$. In other words
+$\mathcal{I}@k$ is the set of items with $k$ or lower rank. 
+
+\subsubsection{Normalized discounted cumulative gain}
+We assume that better recommendation systems put the relevant items
+in the list earlier. Therefore we need a function, that awards the relevant items
+in ratio to their relevance and punishes, if an important item is later in the
+list. 
+
+$$ DCG=\sum_{i \in \mathcal{I}}\frac{s_i}{\log_2(r'_i+1)}.$$
+
+When we use this function on the top $k$ of recommended list, we get $DCG@k$.
+
+$DCG@k$ has some mentionable traits:
+\begin{itemize}
+\item The maximum value of $DCG@k$ is $IDCG@k$. We get this value if and only if in the
+  recommended list contains the same items in the same order as the user's list.
+\item If the first $k$ elements of the recommended list are the user's last $k$ element in
+  reverse order, we get the lowest $DCG@k$ score.
+\item Let's swap two items in the recommended list. We get higher score after the
+  swap, if these two items are now in the same order as in the user's list.
+\end{itemize}
+$nDCG@k$ is the normalized version of $DCG@k$:
+
+$$nDCG@k=\frac{DCG@k}{IDCG@k}$$
+
+\subsubsection{Area under the curve}
+$AUC$ is mainly used to evaluate binary classifications by computing  under
+the ROC curve \cite{prati2008evaluating}. In the context of recommender systems $AUC$ is used to evaluate the
+entire list instead of top $k$ elements of the list. $AUC$ rewards each item pair $i$ $j$, if
+item $i$ has higher predicted score than item $j$ and item $i$ is a positive sample while item
+$j$ is a negative item.
+
+The formal definition is
+
+\[ AUC=\frac{1}{\|\mathcal{I}^{+}\|\cdot\|\mathcal{I}^-\|}
+\sum_{(i,j)\in\mathcal{I}^+\times\mathcal{I}^-}\mathbbm{1} \{s_i > s_j \}.\]
+
+Example:
+
+
+\begin{tabular}{ |c | c | c| c|}
+  \hline			
+  Predicted rank & Predicted score & Actual sore & Actual rank\\
+  \hline
+  \hline
+  1 & 0.5 & 1 & 0.4\\
+  2 & 0.4 & - & - \\
+  3 & 0.3 & 3 & 0.1 \\
+  4 & 0.2 & 2 & 0.3\\
+  5 & 0.1 & - &-\\
+  \hline  
+
+\end{tabular}
