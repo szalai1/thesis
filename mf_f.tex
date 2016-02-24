@@ -87,12 +87,24 @@ Note that when we update $q_i$, we use the $p_u$ from the previous iteration, in
 the previous step.
 
 \subsection{Matrix factorization with alternating least squares}
-Another iterative approach to factorize a matrix is the following\cite{cichocki2007regularized}:
-\begin{itemize}
-\item For a given matrix $S$ and a fixed matrix $P_n$, we compute the matrix $Q_{n+1}$ to 
-minimize the $L(S,P_n Q_{n+1})$ value.
-\item  After we found the best matrix $Q_{n+1}$, we improve our estimation to
-$P$ by finding a better matrix $P_{n+1}$, which minimize  $L(S,P_{n+1} Q_{n+1})$.
-\item We repeat the previous two step while we reach a given condition. 
-\end{itemize}
 
+%As we saw in \ref{sec:model}, our goal is to find the $P$ and $Q$ matrices minimizing \ref{eq:mse}.
+In this part we saw another iterative approach to factorize a matrix in order to predict by the mentioned
+\ref{sec:model} model. We use a objective function slightly different from \ref{eq:mse}
+\[ L_{w}(S,P;Q)=\sum_{(u,i)}c_{u,i}(s_{u,i}-p_{u}q_{i})^2, \]
+with $c_{u,i}\geq0$, we can put different weight on different user-item pairs depending on their relevance.
+We can distinguish the events by their source, we weight them with $c_{u,i}=c^+$ and $c_{u,i}=c^-$, in
+case of  an \emph{implicit} and \emph{explicit} event respectively \footnote{In practice, usually 
+$c^{+}=1$ and $c^{-}=0$}. 
+
+The key idea is the following \cite{takacs2012alternating}:
+
+\begin{algorithm}[H]
+    Fill $Q_0$ with small random values. \\
+    \For{$i$ in $1:N$}{
+        Compute the $P_i$ matrix that minimizes $L_{w}(S,P_i;Q_{i-1})$\\
+        Compute the $Q_i$ matrix that minimizes $L_{w}(S,P_i;Q_i)$
+    }
+  \Return $P,Q$
+  \caption{ALS to factorize matrices}
+\end{algorithm}
