@@ -104,6 +104,20 @@ In the implicit case, we can distinguish the positive and negative events by wei
 
 \begin{figure}[]
 \begin{algorithm}[H]\label{alg:als}
+
+%As we saw in \ref{sec:model}, our goal is to find the $P$ and $Q$ matrices minimizing \ref{eq:mse}.
+In this part we saw another iterative approach to factorize a matrix in order to predict by the mentioned
+\ref{sec:model} model. We use a objective function slightly different from \ref{eq:mse}
+\[ L_{w}(S,P;Q)=\sum_{(u,i)}c_{u,i}(s_{u,i}-p_{u}q_{i})^2, \]
+with $c_{u,i}\geq0$, we can put different weight on different user-item pairs depending on their relevance.
+We can distinguish the events by their source, we weight them with $c_{u,i}=c^+$ and $c_{u,i}=c^-$, in
+case of  an \emph{implicit} and \emph{explicit} event respectively \footnote{In practice, usually 
+$c^{+}=1$ and $c^{-}=0$}. 
+
+The key idea is the following \cite{takacs2012alternating}:
+
+\begin{algorithm}[H]
+
     Fill $Q_0$ with small random values. \\
     \For{$i$ in $1:N$}{
         Compute the $P_i$ matrix that minimizes $L_{w}(S,P_i;Q_{i-1})$\\
@@ -112,6 +126,7 @@ In the implicit case, we can distinguish the positive and negative events by wei
   \Return $P,Q$
   \caption{ALS to factorize matrices}
 \end{algorithm}
+
 \end{figure}
 
  We detail the algorithm \cite{takacs2012alternating} in Algorithm~\ref{alg:als}. The main idea
@@ -136,3 +151,4 @@ dependent ones. We can parallelize the $A^{+}_{u}$ part because the $q_i$
 vectors are independent. We also can save computation complexity by computing only once $A^-$ 
 for one iteration, because its value is the same for each user. 
 We can say the same argumentation for optimizing $L_{w}$ in $Q$.
+
