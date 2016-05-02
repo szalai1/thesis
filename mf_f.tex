@@ -3,7 +3,7 @@
 In this Chapter we present matrix factorization models used in recommender systems 
 and their relation to singular vector decomposition. 
 
-\section{Model} 
+\section{Model} \label{sec:model}
 
 As it was mentioned in Chapter \ref{ch:rec_sys}, our goal is to estimate the missing element of the 
 score matrix $S\in\mathbb{R}^{n\times m}$ with the product of two dense, low dimension 
@@ -25,8 +25,10 @@ parameter values are the factor matrices.
 
 A frequently used loss function is the mean square error on the known $s_{u,i}$ values 
 of the matrix $S$,
+\begin{equation}\label{eq:mse}
+  L(S,P;Q)=\sum_{(u,i)}(s_{u,i}-p_{u}q_{i})^2.
+\end{equation}
 
-\[L(S,P;Q)=\sum_{(u,i)}(s_{u,i}-p_{u}q_{i})^2 .\]
 
 Our objective is to minimize the loss function $L$ with a learning algorithm.
 
@@ -86,13 +88,51 @@ becomes the following
 Note that when we update $q_i$, we use the $p_u$ from the previous iteration, instead of
 the previous step.
 
-\subsection{Matrix factorization with alternating least squares}
-Another iterative approach to factorize a matrix is the following\cite{cichocki2007regularized}:
-\begin{itemize}
-\item For a given matrix $S$ and a fixed matrix $P_n$, we compute the matrix $Q_{n+1}$ to 
-minimize the $L(S,P_n Q_{n+1})$ value.
-\item  After we found the best matrix $Q_{n+1}$, we improve our estimation to
-$P$ by finding a better matrix $P_{n+1}$, which minimize  $L(S,P_{n+1} Q_{n+1})$.
-\item We repeat the previous two step while we reach a given condition. 
-\end{itemize}
 
+
+\subsection{Matrix factorization with alternating least squares}
+
+In this part we introduce another iterative approach to factorize a matrix in order to predict by
+the mentioned model in Section \ref{sec:model}. We use an objective function slightly different
+from \eqref{eq:mse}, called the \emph{wighted} mean square error:
+\begin{equation} \label{eq:wmse}
+   L_{w}(S,P;Q)=\sum_{(u,i)}c_{ui}(s_{ui}-p_{u}q_{i})^2, 
+\end{equation}
+
+where $c_{ui}\geq0$. We can set the weight  $c_{ui}$ of each user-item pair in the objective function.
+In the implicit case, we can distinguish the positive and negative events by weighting them with $c_{ui}=c^+$ and $c_{ui}=c^-$ respectively. In practice, usually $c^{+} \gg c^{-}$. 
+
+\begin{figure}[]
+\begin{algorithm}[H]\label{alg:als}
+    Fill $Q_0$ with small random values. \\
+    \For{$i$ in $1:N$}{
+        Compute the $P_i$ matrix that minimizes $L_{w}(S,P_i;Q_{i-1})$\\
+        Compute the $Q_i$ matrix that minimizes $L_{w}(S,P_i;Q_i)$
+    }
+  \Return $P,Q$
+  \caption{ALS to factorize matrices}
+\end{algorithm}
+\end{figure}
+
+ We detail the algorithm \cite{takacs2012alternating} in Algorithm~\ref{alg:als}. The main idea
+ of  the ALS algorithm is to compute the best $P$ matrix for the previously set $Q$ matrix  and
+ than $Q$ for $P$ to minimize the loss function and repeat this an alternating way using gradient
+ method. ALS is very efficiently implementable and parallelizable to understand this we have to analyze the derivative of objective function \eqref{eq:wmse}.
+
+\[
+\frac{\partial L_{w}(S,P;Q)}{\partial p_u} = \sum_{i\in \mathcal{I}} c_{ui}\left(q_ip_u- s_{ui}\right)q_i =
+\underbracket{\left(\sum_{i\in\mathcal{I}}c_{ui}q_iq_i^T\right)}_{A_{u}}p_u-
+\underbracket{\sum_{i\in\mathcal{I}}c_{ui}s_{ui}q_i}_{b_u}
+\]
+
+Our goal is to minimize $L_{w}(S,P;Q)$ in $P$, that implies 
+$\frac{\partial L_{w}(S,P;Q)}{\partial p_u}=0$, what is equivalent to solving the $A_{u}p_{u}=b_{u}$ equation. We can notice that $b_u$ is actually runs over the user dependent items, because for other items  $s_{ui}=0$. Furthermore, we can separate the $A_u$ sum over items into two parts by their dependence to the user:
+
+\[A_{u}=\underbracket{\sum_{i\in \mathcal{I}}c^-q_i q_i^T}_{A^-} +
+\underbracket{\sum_{i\in\mathcal{I}_{u}}(c^+-c^-)q_i q_i^T}_{A_{u}^{+}} \]
+
+Notice that the first part contains  elements for all user and the seconds only the user
+dependent ones. We can parallelize the $A^{+}_{u}$ part because the $q_i$
+vectors are independent. We also can save computation complexity by computing only once $A^-$ 
+for one iteration, because its value is the same for each user. 
+We can say the same argumentation for optimizing $L_{w}$ in $Q$.

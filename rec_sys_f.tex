@@ -53,18 +53,58 @@ discuss this topic in detail.
 If we use not only the fact of the interaction, but other circumstances too, we talk about 
 context-based recommendation. We present this approach in chapter \ref{ch:context}.
 
-\section{Online and offline recommendation}
+\section{Experimental settings for online and offline recommendation}
+In this Section we distinguish three possible experimental setups to evaluate recommender
+systems. %We identify and explain the three main types of recommender evaluation. %This three type
+%is \emph{online}, \empy{batch} and \emph{train-test} evaluation.
+The traditional evaluation technique is the \emph{train-test} evaluation. In this case we
+separate the given data  randomly to train and a test set. The recommender algorithm learn on
+the train set and we evaluate the performance on the test. We can see this represented on sample on Figure~\ref{fig:online} top. Sometimes we distinguish a small part
+of the train, called \emph{evaluation} data set to avoid the overfitting on the test. This evaluation technique is well known and used not only to evaluate recommender systems, but classification algorithms. One remarkable virtue of approach is that it does not require any timely information.
 
-\section{Evaluation}\label{sec:eval}
+Secondly, another evaluation method is timely \emph{batch} training and evaluation.
+%In this case, do not evaluate the 
+%system after each user action, instead of wait for a given time evaluate the prediction 
+%in the last period and after that update the model with the collected inforamtion. 
+We re-train the model periodically over time, for example we learn weekly re-trained batch models.
+We evaluate the performance of the model on next week's incoming interactions.
+For example a music recommender system predicts a list of music tracks for the user and after that 
+waits for a given time to collect the user's feedbacks and then evaluate the model, finally update its model with the 
+collected her rates and evaluate the recommendation compered to the actual rates. In the next period the
+systems use these rates to improve  the model. 
+This kind of approach can be seen on Figure~\ref{fig:online} middle.
+
+Thirdly, if we have a time series where each data point has a timestamp or we get the data records in temporal oreder, we can
+evaluate and update the model after it predicted for each record one by one. This attitude helps
+the model to learn temporal behaves and trends. We call this method \emph{online}
+evaluation/learning.  Using the feedback, the system evaluate the model and promptly   update it to
+improve the performance. In case of the  previously mentioned music recommendation` example, the recommender system predict for 
+the user a track and right after the user's feedback it updates the model. In other
+words the system \emph{learn and predict} one-by-one in each round in temporal order.
+
+
+\begin{figure}[''placement specifier''] \label{fig:online}
+\centering 
+\includegraphics[scale=.6]{tex/pic/online.eps}
+\caption{Let us consider each point as an event, when a user rates a track. These events are order by time.
+If a point is filled with black, it is used for training the model, if the point is not filled, the model 
+recommends for that user whitout previously seeing that record. 
+\emph{Offline} learning technic do not use the temporal order. However, \emph{bach} prediction, 
+evaluates and learns periodically. Finally, the online method uses the whole previous data to predict for the next user. }
+\end{figure}
+
+\section{Evaluation metrics }\label{sec:eval}
 Recommender systems can order items by their relevance for the users. We compare the
 predicted values with the actual user-item preferences to evaluate the given recommender
-system. The evaluation functions can be separated two main groups: rating and ranking  based ones.
+system. The evaluation functions can be separated to two main groups: rating and ranking  based ones.
 
 \subsection{Rating based evaluation }
+In case of rating based evaluations we use the predicted and actual score values to evaluate 
+the recommender system.
 
 \subsubsection{Mean square error}
 Mean square error or \emph{Euclidean distance} is a common metric. We can use it to
-evaluate recommender systems,
+evaluate recommender systems.
 
 \[MSE=\sum_{i\in\mathcal{I}}(\hat{s}_{ui} - s_{ui})^2.\]
 
@@ -72,6 +112,9 @@ Where $\hat{s}_{ui}$ the predicted value for the user $u$ and item $i$ pair and 
 
 
 \subsection{Ranking based evaluation}
+Ranking based evaluations use the predicted items rank instead of their value to rate the
+performance of the recommender system.
+
 Let $\mathcal{I}$ be the set of items, $r_i$ be the rank of the item $i$ in the
 user's relevance list \footnote{lower rank means higher importance}  and
 $r'_i$ be the rank of the item $i$ in the predicted list of the recommender system.
@@ -104,28 +147,51 @@ $$nDCG@k=\frac{DCG@k}{IDCG@k}$$
 \subsubsection{Area under the curve}
 $AUC$ is mainly used to evaluate binary classifications by computing  under
 the ROC curve \cite{prati2008evaluating}. In the context of recommender systems $AUC$ is used to evaluate the
-entire list instead of top $k$ elements of the list. $AUC$ rewards each item pair $i$ $j$, if
+entire recommendation instead of top $k$ elements of the list. $AUC$ rewards each item pair $i$ $j$, if
 item $i$ has higher predicted score than item $j$ and item $i$ is a positive sample while item
 $j$ is a negative item.
 
 The formal definition is
+\begin{equation} \label{eq:auc}
+     AUC=\frac{1}{\|\mathcal{I}^{+}\|\cdot\|\mathcal{I}^-\|}
+\sum_{(i,j)\in\mathcal{I}^+\times\mathcal{I}^-}\mathbbm{1} \{\hat{s}_i > \hat{s}_j \}, 
+\end{equation}
 
-\[ AUC=\frac{1}{\|\mathcal{I}^{+}\|\cdot\|\mathcal{I}^-\|}
-\sum_{(i,j)\in\mathcal{I}^+\times\mathcal{I}^-}\mathbbm{1} \{s_i > s_j \}.\]
+where $\mathcal{I}^+$ and $\mathcal{I}^{-}$ are the set of the previously rated and not rated items respectively and $\hat{s}_i$ is the predicted score for item $i$. 
 
-Example:
+Let us consider an example for $AUC$. In this example we have five items, three of them scored by
+the user and two of them are not rated previously. These data points can be find in the Table~\ref{tab:auc}.
+
+The recommender system evaluation by $AUC$ takes place the following way:
+\begin{enumerate}
+    \item The recommender system predicts a score for each known item using the previously trained
+    model. 
+    
+    These values can be seen in the $\hat{s}$ column of the Table ~\ref{tab:auc}. 
+    
+    \item We order the items by their predicted score. Next compute for each 
+    item $i\in\mathcal{I}^+$ that how many item $j\in\mathcal{I}^-$ has lower predicted score. 
+    
+    In the example these values can be find in the last column of the Table~\ref{tab:auc}
+    \item Finally, we use the equation~\eqref{eq:auc} to compute the $AUC$ value. 
+    
+    The $AUC$ for our examples is
+    \[ AUC=\frac{1}{2\cdot3}\left(2+1\right)=\frac{3}{6}=\frac{1}{2}\]
 
 
-\begin{tabular}{ |c | c | c| c|}
+\begin{table}[]
+\centering
+\begin{tabular}{ |c|c|c|} 
   \hline			
-  Predicted rank & Predicted score & Actual sore & Actual rank\\
+    $\hat{s}$ & $s$ & \specialcell{ Number of\\ negative items with\\ lower score}\\
   \hline
   \hline
-  1 & 0.5 & 1 & 0.4\\
-  2 & 0.4 & - & - \\
-  3 & 0.3 & 3 & 0.1 \\
-  4 & 0.2 & 2 & 0.3\\
-  5 & 0.1 & - &-\\
-  \hline  
-
+   0.5 & $\left(+\right)$ & 2\\
+   0.4 & $\left(-\right)$  & - \\
+   0.3 & $\left(+\right)$  & 1\\
+   0.2 & $\left(-\right)$  & -\\
+   0.1 & $\left(+\right)$  & 0\\
+ \hline  
 \end{tabular}
+\caption{Example for $AUC$}\label{tab:auc}
+\end{table}

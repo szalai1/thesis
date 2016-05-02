@@ -1,14 +1,28 @@
 \chapter{Introduction}
 The storage capacity for a given cost is increasing exponentially \cite{wiki:krydr}.
-This tendency allows us to store information at low cost.Furthermore, services like the WWW
+This tendency allows us to store information at low cost. Furthermore, services like the WWW
 resulted accelerated communication patterns in a highly connected human society. As a
 result, accessing information at no cost become a standard in the 21st century. However,
-for a given person, the amount of reachable information is too large. In the age of big
-data, users of the WWW are flooded by accessibleinformation. Services like search engines
+for a given person, the amount of reachable information is too large to process. In the age of big
+data, users of the WWW are flooded by accessible information. Services like search engines
 and recommender systems serve to filter for the given user the available information, and
 only retrieve relevant information for her. 
 
-
 Recommender systems are able to solve this problem by filtering items and recommend the 
 suitable ones to users. Recommender systems can  also predict user-item interactions and
-the  user behavior. These systems are used by online companies/providers/websites to improve the users satisfaction and to increase the number of users in the same time. 
+the  user behavior. These systems are used by online companies/providers/websites to improve
+the users satisfaction and to increase the number of their users in the same time. 
+
+Recommender systems also able to use event related information, so called contextual information,
+to make their recommendation more accurate. These contxtual informations can anything, which 
+distinguish two user item interaction for example geolocation, session, item or user releated informations.
+
+In this thesis, after we explained the basic mathematical background of the recommender systems,
+discuss about recommender systems in general and focus on some specific fields of this topic, such as \emph{online} evaluation and \emph{context-based} recommendation. Furthermore, we present some of our result.
+
+The structure of this thesis is the following. In Section~\ref{ch:rec_sys}, we go through the 
+evaluation technics, models  and recommendation variants. In Section~\ref{ch:mf}, we explain the 
+essential mathematical background of the matrix factorization and its learning process. After that
+in Section~\ref{ch:context} we discuss about different type of context-aware recommendation. Finally,
+we present out models and expound their performance in context of known baseline algorithms, in 
+Section~\ref{ch:res}.
